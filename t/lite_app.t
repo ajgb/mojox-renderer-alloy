@@ -17,6 +17,7 @@ app->log->level('fatal');
 use_ok('MojoX::Renderer::Alloy');
 
 plugin 'alloy_renderer' => {
+    syntax => 'TT',
     template_options => {
         PRE_CHOMP => 1,
         POST_CHOMP => 1,

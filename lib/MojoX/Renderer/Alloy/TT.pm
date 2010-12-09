@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package MojoX::Renderer::Alloy;
+package MojoX::Renderer::Alloy::TT;
 
 use warnings;
 use strict;
