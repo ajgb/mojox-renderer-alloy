@@ -11,10 +11,6 @@ use Template::Alloy qw( TT );
 use File::Spec ();
 use Mojo::Util 'md5_sum';
 
-use Data::Dumper;
-$Data::Dumper::Indent=1;
-use Test::More;
-
 __PACKAGE__->attr('alloy');
 
 sub build {
@@ -49,15 +45,12 @@ sub _init {
         ABSOLUTE    => 1,
         %{ $args{template_options} || {} },
     );
-    diag Dumper(\%config);
 
     $self->alloy( Template::Alloy->new(%config) );
 }
 
 sub _render {
     my ($self, $r, $c, $output, $options) = @_;
-
-#    diag Dumper($options);
 
     my $inline = $options->{inline};
 
@@ -77,17 +70,12 @@ sub _render {
                     $c->render_exception(
                         "Inlined templates are not supported"
                     );
-                    return;
+                } else {
+                    $c->render_not_found( $tname );
                 }
+                return;
             };
 
-#    diag "input: ". Dumper($input);
-
-    unless ( defined $input ) {
-        diag "** not found **";
-        $c->render_not_found( $tname );
-        return;
-    }
 
     my $alloy = $self->alloy;
 
@@ -100,7 +88,7 @@ sub _render {
         { binmode => ':utf8' },
     ) || do {
         my $e = $alloy->error;
-        diag "tt error: $e";
+        chomp $e;
         $c->render_exception( $e );
     };
 }

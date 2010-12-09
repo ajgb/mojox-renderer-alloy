@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 22;
+use Test::More tests => 25;
 
 use Mojolicious::Lite;
 use Mojo::ByteStream 'b';
@@ -38,40 +38,67 @@ get '/helpers' => 'helpers';
 
 get '/unknown_helper' => 'unknown_helper';
 
+get '/not_supported' => 'not_supported';
+
 get '/on-disk' => 'foo';
 
 get '/foo/:message' => 'index';
 
+
 my $t = Test::Mojo->new;
 
 # Exception
-$t->get_ok('/exception')->status_is(500)->content_like(qr/error/i);
+$t->get_ok('/exception')
+    ->status_is(500)
+    ->content_like(qr/parse error/);
 
 # Normal rendering
-$t->get_ok('/foo/hello')->content_is("hello");
+$t->get_ok('/foo/hello')
+    ->content_is("hello");
 
 # With include
-$t->get_ok('/with_include')->content_is("HelloInclude!Hallo");
+$t->get_ok('/with_include')
+    ->content_is("HelloInclude!Hallo");
 
 # With wrapper
-$t->get_ok('/with_wrapper')->content_is("wrapped");
+$t->get_ok('/with_wrapper')
+    ->content_is("wrapped");
 
 # With auto wrapper
 #$t->get_ok('/with_auto_wrapper')->content_is("wrapped");
 
 # Unicode
-$t->get_ok('/unicode')->content_is(b("привет")->encode('UTF-8')->to_string);
+$t->get_ok('/unicode')
+    ->content_is(
+        b("привет")->encode('UTF-8') ->to_string
+    );
 
 # Helpers
-$t->get_ok('/helpers')->content_is("/helpers");
+$t->get_ok('/helpers')
+    ->content_is("/helpers");
 
 # Unknown helper
-$t->get_ok('/unknown_helper')->status_is(500)->content_like(qr//);
-$t->get_ok('/unknown_helper')->status_is(500)->content_is('qr//');
+$t->get_ok('/unknown_helper')
+    ->status_is(500)
+    ->content_like(qr/error.*unknown_helper/);
+
+# Inlined template
+$t->get_ok('/not_supported')
+    ->status_is(500)
+    ->content_like(qr/Inlined templates are not supported/);
 
 # On Disk
-$t->get_ok('/on-disk')->content_is("4");
+$t->get_ok('/on-disk')
+    ->content_is("4");
 
 # Not found
-$t->get_ok('/not_found')->status_is(404)->content_like(qr/not found/i);
+$t->get_ok('/not_found')
+    ->status_is(404)
+    ->content_like(qr/not found/i);
+
+__DATA__
+
+@@ not_supported.html.tt
+
+Inlined templates are not supported
 
