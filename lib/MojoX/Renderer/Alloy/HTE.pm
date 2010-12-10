@@ -23,7 +23,10 @@ sub _init {
                 path => [ $inc_path ]
             ) : ()
         ),
-        ENCODING => 'UTF-8',
+        UNICODE     => 1,
+        ENCODING    => 'utf-8',
+        RELATIVE    => 1,
+        ABSOLUTE    => 1,
         %{ $args{template_options} || {} },
     );
 
