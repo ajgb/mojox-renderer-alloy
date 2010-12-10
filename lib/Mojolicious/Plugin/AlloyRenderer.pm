@@ -63,6 +63,7 @@ sub register {
         my $alloy = $class->build(%$args, app => $app);
 
         $app->renderer->add_handler($extension => $alloy);
+        $app->renderer->default_handler($extension);
 
     }
 }
