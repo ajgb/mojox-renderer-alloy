@@ -11,7 +11,7 @@ use Mojo::ByteStream 'b';
 use Test::Mojo;
 
 # Silence
-app->log->level('debug');
+app->log->level('fatal');
 
 use_ok('MojoX::Renderer::Alloy::Tmpl');
 
