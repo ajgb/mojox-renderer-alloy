@@ -54,21 +54,21 @@ $t->get_ok('/exception')
 
 # Normal rendering
 $t->get_ok('/foo/hello')
-    ->content_is("hello");
-#__END__
+    ->content_is('hello');
 
 # With include
 $t->get_ok('/with_include')
-    ->content_like(qr/Hello\s?Include!\s?Hallo/);
+    ->content_is('HelloInclude!Hallo');
 
 # With wrapper
 $t->get_ok('/with_wrapper')
-    ->content_like(qr/wrapped/);
+    ->content_is('wrapped');
 
 # Unicode
-my $uc = b("привет")->encode('UTF-8')->to_string;
 $t->get_ok('/unicode')
-    ->content_like(qr/$uc/);
+    ->content_is(
+        b("привет")->encode('UTF-8')->to_string
+    );
 
 # Helpers
 $t->get_ok('/helpers')
