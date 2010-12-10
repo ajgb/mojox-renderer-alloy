@@ -5,7 +5,6 @@ package MojoX::Renderer::Alloy::Tmpl;
 use base 'MojoX::Renderer::Alloy';
 
 use Template::Alloy qw( Tmpl );
-use File::Spec ();
 
 __PACKAGE__->attr('alloy');
 
@@ -14,16 +13,36 @@ sub _init {
 
     my $app = delete $args{app} || delete $args{mojo};
 
-    my $compile_dir = defined $app && $app->home->rel_dir('tmp/ctpl');
     my $inc_path  = defined $app && $app->home->rel_dir('templates');
 
-    my $alloy = Template::Alloy->new();
+    my %config = (
+        (
+            $inc_path ?
+            (
+                INCLUDE_PATH => $inc_path
+            ) : ()
+        ),
+        UNICODE     => 1,
+        ENCODING    => 'utf-8',
+        RELATIVE    => 1,
+        ABSOLUTE    => 1,
+        START_TAG   => '#[',
+        END_TAG   => ']#',
+        %{ $args{template_options} || {} },
+    );
+
+    my $alloy = Template::Alloy->new(
+        %config,
+    );
 
     $alloy->set_dir( $inc_path )
         if $inc_path;
+    $alloy->set_delimiters(@config{qw(START_TAG END_TAG)});
 
-    while ( my ($option, $value) = keys %{ $args{template_options} || {} } ) {
-        $alloy->$option( $value );
+    while ( my ($option, $value) = each %{ $args{template_options} || {} } ) {
+        if ( my $m = $alloy->can($option) ) {
+            $m->($alloy, $value);
+        }
     }
 
     $self->alloy( $alloy );
@@ -74,7 +93,11 @@ sub _render {
     if ( my $e = $alloy->error || $@ ) {
         chomp $e;
         $c->render_exception( $e );
+
+        return;
     };
+
+    return 1;
 }
 
 1;
