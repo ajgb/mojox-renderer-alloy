@@ -8,7 +8,7 @@ use base 'Mojolicious::Plugin';
 
 use Mojo::Loader;
 
-my %ext = (
+my %syn2ext = (
     'TT' => 'tt',
     'Velocity' => 'vtl',
     'Tmpl' => 'tmpl',
@@ -24,7 +24,7 @@ sub register {
         # default extensions
         # syntax => [qw( TT HTE )]
         if ( ref $s eq 'ARRAY' ) {
-            push @setup, [ $_ => $ext{$_} ]
+            push @setup, [ $_ => $syn2ext{$_} ]
                 for @$s;
         }
         # custom extensions
@@ -37,14 +37,19 @@ sub register {
         # single syntax with default extension
         # syntax => 'HTE'
         elsif ( ! ref $s ) {
-            push @setup, [ $s => $ext{$s} ];
+            if ( $s eq ':all' ) {
+                push @setup, [ $_ => $syn2ext{$_} ]
+                    for keys %syn2ext;
+            } else {
+                push @setup, [ $s => $syn2ext{$s} ];
+            }
         }
         else {
             die "Unrecognised configuration for 'alloy_renderer' plugin: $s\n";
         }
     # defaults to TT
     } else {
-        push @setup, [ TT => $ext{TT} ];
+        push @setup, [ TT => $syn2ext{TT} ];
     }
 
     my $loader = Mojo::Loader->new;
