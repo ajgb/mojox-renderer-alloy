@@ -10,6 +10,9 @@ use Mojolicious::Lite;
 use Mojo::ByteStream 'b';
 use Test::Mojo;
 
+use File::Path qw( rmtree );
+END { rmtree("t/tmp") };
+
 # Silence
 app->log->level('fatal');
 
