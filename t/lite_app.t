@@ -14,7 +14,7 @@ use Test::Mojo;
 # Silence
 app->log->level('fatal');
 
-use_ok('MojoX::Renderer::Alloy');
+use_ok('MojoX::Renderer::Alloy::TT');
 
 plugin 'alloy_renderer' => {
     syntax => 'TT',
