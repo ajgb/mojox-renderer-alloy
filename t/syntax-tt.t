@@ -44,6 +44,7 @@ get '/foo/:message' => 'index';
 
 
 my $t = Test::Mojo->new;
+$t->app->renderer->detect_templates( 0 );
 
 # Exception
 $t->get_ok('/exception')
