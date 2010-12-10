@@ -14,7 +14,6 @@ sub _init {
 
     my $app = delete $args{app} || delete $args{mojo};
 
-    my $compile_dir = defined $app && $app->home->rel_dir('tmp/ctpl');
     my $inc_path  = defined $app && $app->home->rel_dir('templates');
 
     my %config = (
@@ -24,8 +23,7 @@ sub _init {
                 path => [ $inc_path ]
             ) : ()
         ),
-        file_cache => 1,
-        file_cache_dir => ( $compile_dir || File::Spec->tmpdir ),
+        ENCODING => 'UTF-8',
         %{ $args{template_options} || {} },
     );
 
@@ -40,24 +38,27 @@ sub _render {
     my $tname = $r->template_name($options);
     my $path = $r->template_path($options);
 
-    $path = \$inline if defined $inline;
+    return unless defined $inline || ( defined $path && defined $tname );
 
-    return unless defined $path && defined $tname;
 
     my $alloy;
-
     # inline
-    if ( ref $path ) {
-        $alloy = Template::Alloy->new_scalar_ref( $path,
-            %{ $self->_hte_config }
+    if ( defined $inline ) {
+        $alloy = Template::Alloy->new(
+            type => 'scalarref',
+            source => \$inline,
+            %{ $self->_hte_config },
         );
     }
     # regular file
     elsif ( -r $path ) {
-        $alloy = Template::Alloy->new_file( $path,
-            %{ $self->_hte_config }
+        $alloy = Template::Alloy->new(
+            type => 'filename',
+            source => $path,
+            %{ $self->_hte_config },
         );
-    } else {
+    }
+    else {
         # inlined templates are not supported
         if ( $r->get_inline_template($options, $tname) ) {
             $c->render_exception(
@@ -69,7 +70,7 @@ sub _render {
         return;
     }
 
-    $alloy->param( 
+    $alloy->param(
         {
             %{ $c->stash },
             c => $c,
@@ -82,7 +83,11 @@ sub _render {
     if ( my $e = $alloy->error || $@ ) {
         chomp $e;
         $c->render_exception( $e );
+
+        return;
     };
+
+    return 1;
 }
 
 1;
