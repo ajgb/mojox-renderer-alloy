@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package MojoX::Renderer::Alloy::HTE;
+#ABSTRACT: Template::Alloy's HTML::Template::Expr renderer
 
 use base 'MojoX::Renderer::Alloy';
 
@@ -9,26 +10,43 @@ use File::Spec ();
 
 __PACKAGE__->attr('_hte_config');
 
-sub _init {
-    my ($self, %args) = @_;
+=head1 SYNOPSIS
 
-    my $app = delete $args{app} || delete $args{mojo};
+Mojolicious
 
-    my $inc_path  = defined $app && $app->home->rel_dir('templates');
-
-    my %config = (
-        (
-            $inc_path ?
-            (
-                path => [ $inc_path ]
-            ) : ()
-        ),
-        UNICODE     => 1,
-        ENCODING    => 'utf-8',
-        RELATIVE    => 1,
-        ABSOLUTE    => 1,
-        %{ $args{template_options} || {} },
+    $self->plugin( 'alloy_renderer',
+        {
+            syntax => 'HTE',
+        }
     );
+
+Mojolicious::Lite
+
+    plugin( 'alloy_renderer',
+        {
+            syntax => 'HTE',
+        }
+    );
+
+=head1 DESCRIPTION
+
+    <a href="<TMPL_VAR EXPR="c.url_for('about_us')">"Hello!</a>
+
+    <TMPL_INCLUDE NAME="include.inc">
+
+Use L<Template::Alloy::HTE> for rendering.
+
+Please see L<Mojolicious::Plugin::AlloyRenderer> for configuration options.
+
+=cut
+
+sub _init {
+    my $self = shift;
+
+    my %config = $self->_default_config(@_);
+
+    $config{path} = $config{INCLUDE_PATH}
+        unless exists $config{path};
 
     $self->_hte_config( \%config );
 }

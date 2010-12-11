@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package MojoX::Renderer::Alloy::Tmpl;
+#ABSTRACT: Template::Alloy's Text::Tmpl renderer
 
 use base 'MojoX::Renderer::Alloy';
 
@@ -8,42 +9,55 @@ use Template::Alloy qw( Tmpl );
 
 __PACKAGE__->attr('alloy');
 
+=head1 SYNOPSIS
+
+Mojolicious
+
+    $self->plugin( 'alloy_renderer',
+        {
+            syntax => 'Tmpl',
+        }
+    );
+
+Mojolicious::Lite
+
+    plugin( 'alloy_renderer',
+        {
+            syntax => 'Tmpl',
+        }
+    );
+
+=head1 DESCRIPTION
+
+    <a href="#[ echo c.url_for('about_us') ]#">Hello!</a>
+
+    #[include "include.inc"]#
+
+Use L<Template::Alloy::Tmpl> for rendering.
+
+Please see L<Mojolicious::Plugin::AlloyRenderer> for configuration options.
+
+Note: default delimiters (I<START_TAG> and I<END_TAG>) are C<#[> and C<]#>.
+
+=cut
+
 sub _init {
-    my ($self, %args) = @_;
-
-    my $app = delete $args{app} || delete $args{mojo};
-
-    my $inc_path  = defined $app && $app->home->rel_dir('templates');
+    my $self = shift;
 
     my %config = (
-        (
-            $inc_path ?
-            (
-                INCLUDE_PATH => $inc_path
-            ) : ()
-        ),
-        UNICODE     => 1,
-        ENCODING    => 'utf-8',
-        RELATIVE    => 1,
-        ABSOLUTE    => 1,
         START_TAG   => '#[',
         END_TAG   => ']#',
-        %{ $args{template_options} || {} },
+        $self->_default_config(@_),
     );
 
     my $alloy = Template::Alloy->new(
         %config,
     );
 
-    $alloy->set_dir( $inc_path )
-        if $inc_path;
-    $alloy->set_delimiters(@config{qw(START_TAG END_TAG)});
+    $alloy->set_dir( $config{INCLUDE_PATH} )
+        if exists $config{INCLUDE_PATH};
 
-    while ( my ($option, $value) = each %{ $args{template_options} || {} } ) {
-        if ( my $m = $alloy->can($option) ) {
-            $m->($alloy, $value);
-        }
-    }
+    $alloy->set_delimiters(@config{qw(START_TAG END_TAG)});
 
     $self->alloy( $alloy );
 }

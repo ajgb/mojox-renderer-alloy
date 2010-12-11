@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package MojoX::Renderer::Alloy::Velocity;
+#ABSTRACT: Template::Alloy's Velocity renderer
 
 use base 'MojoX::Renderer::Alloy';
 
@@ -8,33 +9,35 @@ use Template::Alloy qw( Velocity );
 
 __PACKAGE__->attr('alloy');
 
-sub _init {
-    my ($self, %args) = @_;
+=head1 SYNOPSIS
 
-    my $app = delete $args{app} || delete $args{mojo};
+Mojolicious
 
-    my $inc_path  = defined $app && $app->home->rel_dir('templates');
-
-    my %config = (
-        (
-            $inc_path ?
-            (
-                INCLUDE_PATH => $inc_path
-            ) : ()
-        ),
-        UNICODE     => 1,
-        ENCODING    => 'utf-8',
-        RELATIVE    => 1,
-        ABSOLUTE    => 1,
-        %{ $args{template_options} || {} },
+    $self->plugin( 'alloy_renderer',
+        {
+            syntax => 'Velocity',
+        }
     );
 
-    my $alloy = Template::Alloy->new(
-        %config,
+Mojolicious::Lite
+
+    plugin( 'alloy_renderer',
+        {
+            syntax => 'Velocity',
+        }
     );
 
-    $self->alloy( $alloy );
-}
+=head1 DESCRIPTION
+
+    <a href="$c.url_for('about_us')">Hello!</a>
+
+    #include('include.inc')
+
+Use L<Template::Alloy::Velocity> for rendering.
+
+Please see L<Mojolicious::Plugin::AlloyRenderer> for configuration options.
+
+=cut
 
 sub _render {
     my ($self, $r, $c, $output, $options) = @_;

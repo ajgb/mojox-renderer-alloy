@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package MojoX::Renderer::Alloy::TT;
+#ABSTRACT: Template::Alloy's Template-Toolkit renderer
 
 use base 'MojoX::Renderer::Alloy';
 
@@ -9,33 +10,28 @@ use File::Spec ();
 
 __PACKAGE__->attr('alloy');
 
-sub _init {
-    my ($self, %args) = @_;
+=head1 SYNOPSIS
 
-    my $app = delete $args{app} || delete $args{mojo};
+Mojolicious
 
-    my $compile_dir = defined $app && $app->home->rel_dir('tmp/ctpl');
-    my $inc_path  = defined $app && $app->home->rel_dir('templates');
+    $self->plugin( 'alloy_renderer' );
 
-    my %config = (
-        (
-            $inc_path ?
-            (
-                INCLUDE_PATH => $inc_path
-            ) : ()
-        ),
-        COMPILE_EXT => '.ttc',
-        COMPILE_DIR => ( $compile_dir || File::Spec->tmpdir ),
-        UNICODE     => 1,
-        ENCODING    => 'utf-8',
-        CACHE_SIZE  => 128,
-        RELATIVE    => 1,
-        ABSOLUTE    => 1,
-        %{ $args{template_options} || {} },
-    );
+Mojolicious::Lite
 
-    $self->alloy( Template::Alloy->new(%config) );
-}
+    plugin( 'alloy_renderer' );
+
+=head1 DESCRIPTION
+
+    <a href="[% c.url_for('about_us') %]">Hello!</a>
+
+    [% INCLUDE "include.inc" %]
+
+Use L<Template::Alloy::TT> for rendering.
+
+Please see L<Mojolicious::Plugin::AlloyRenderer> for configuration options.
+
+=cut
+
 
 sub _render {
     my ($self, $r, $c, $output, $options) = @_;
