@@ -24,7 +24,6 @@ plugin 'alloy_renderer' => {
         PRE_CHOMP => 1,
         POST_CHOMP => 1,
         TRIM => 1,
-        set_strip => 1,
     }
 };
 
