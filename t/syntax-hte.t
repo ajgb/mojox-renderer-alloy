@@ -69,7 +69,7 @@ $t->get_ok('/with_wrapper')
 # Unicode
 $t->get_ok('/unicode')
     ->content_is(
-        b("привет")->encode('UTF-8') ->to_string
+        b("привет")->to_string
     );
 
 # Helpers
