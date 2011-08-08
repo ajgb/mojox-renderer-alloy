@@ -1,5 +1,9 @@
 Revision history for MojoX-Renderer-Alloy
 
+1.112200    Mon Aug  8 23:43:58 2011
+            Update for Mojolicious 1.3 (reported by Александер Пономарёв)
+            Provide helpers as "h" (fixes test for unknown helper).
+
 1.110180    Tue Jan 18 20:46:47 2011
             Fix tests for Mojolicious 1.01. 
 

@@ -27,7 +27,8 @@ Base abstract class for following renderers:
 
 Build handler for selected renderer.
 
-Please note that for all renderers a L<Mojolicious::Controller> is available as C<c> variable.
+Please note that for all renderers a L<Mojolicious::Controller> is available
+as C<c> variable, while helpers are available as C<h> variable.
 
 =cut
 
@@ -93,7 +94,7 @@ sub _get_input {
             $path # regular file
             :
             do { # inlined templates are not supported
-                if ( $r->get_inline_template($options, $tname) ) {
+                if ( $r->get_data_template($options, $tname) ) {
                     $c->render_exception(
                         "Inlined templates are not supported"
                     );
@@ -104,4 +105,47 @@ sub _get_input {
             };
 };
 
+sub _template_vars {
+    my ($self, $c) = @_;
+
+    my $helper = MojoX::Renderer::Alloy::Helper->new(ctx => $c);
+
+    # allows to overwrite "h"
+    return {
+        h => $helper,
+        %{ $c->stash },
+        c => $c,
+    },
+}
+
+# stolen from MojoX::Renderer::TT
+package
+  MojoX::Renderer::Alloy::Helper;
+
+use strict;
+use warnings;
+
+use base 'Mojo::Base';
+
+our $AUTOLOAD;
+
+__PACKAGE__->attr('ctx');
+
+sub AUTOLOAD {
+    my $self = shift;
+
+    my $method = $AUTOLOAD;
+
+    return if $method =~ /^[A-Z]+?$/;
+    return if $method =~ /^_/;
+    return if $method =~ /(?:\:*?)DESTROY$/;
+
+    $method = (split '::' => $method)[-1];
+
+    die qq/Unknown helper: $method/ unless $self->ctx->app->renderer->helpers->{$method};
+
+    return $self->ctx->$method(@_);
+}
+
 1;
+

@@ -29,7 +29,7 @@ Mojolicious::Lite
 
 =head1 DESCRIPTION
 
-    <a href="$c.url_for('about_us')">Hello!</a>
+    <a href="$h.url_for('about_us')">Hello!</a>
 
     #include('include.inc')
 
@@ -50,10 +50,7 @@ sub _render {
     # Template::Alloy won't handle undefined strings
     $$output = '' unless defined $$output;
     $alloy->merge( $input,
-        {
-            %{ $c->stash },
-            c => $c,
-        },
+        $self->_template_vars( $c ),
         $output,
     ) || do {
         my $e = $alloy->error;

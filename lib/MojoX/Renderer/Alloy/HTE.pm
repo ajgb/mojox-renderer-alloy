@@ -30,7 +30,7 @@ Mojolicious::Lite
 
 =head1 DESCRIPTION
 
-    <a href="<TMPL_VAR EXPR="c.url_for('about_us')">"Hello!</a>
+    <a href="<TMPL_VAR EXPR="h.url_for('about_us')">"Hello!</a>
 
     <TMPL_INCLUDE NAME="include.inc">
 
@@ -81,7 +81,7 @@ sub _render {
     }
     else {
         # inlined templates are not supported
-        if ( $r->get_inline_template($options, $tname) ) {
+        if ( $r->get_data_template($options, $tname) ) {
             $c->render_exception(
                 "Inlined templates are not supported"
             );
@@ -92,10 +92,7 @@ sub _render {
     }
 
     $alloy->param(
-        {
-            %{ $c->stash },
-            c => $c,
-        },
+        $self->_template_vars( $c )
     );
 
     eval {

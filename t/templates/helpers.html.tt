@@ -1,1 +1,1 @@
-[% c.url_for('helpers') %]
+[% h.url_for('helpers') %]

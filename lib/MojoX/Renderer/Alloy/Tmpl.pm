@@ -29,7 +29,7 @@ Mojolicious::Lite
 
 =head1 DESCRIPTION
 
-    <a href="#[ echo c.url_for('about_us') ]#">Hello!</a>
+    <a href="#[ echo h.url_for('about_us') ]#">Hello!</a>
 
     #[include "include.inc"]#
 
@@ -83,7 +83,7 @@ sub _render {
         $method = 'parse_file';
     } else {
         # inlined templates are not supported
-        if ( $r->get_inline_template($options, $tname) ) {
+        if ( $r->get_data_template($options, $tname) ) {
             $c->render_exception(
                 "Inlined templates are not supported"
             );
@@ -95,10 +95,7 @@ sub _render {
 
     my $alloy = $self->alloy;
     $alloy->set_values(
-        {
-            %{ $c->stash },
-            c => $c,
-        },
+        $self->_template_vars( $c )
     );
 
     eval {

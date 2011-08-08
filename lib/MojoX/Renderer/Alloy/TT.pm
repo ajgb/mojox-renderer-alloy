@@ -22,7 +22,7 @@ Mojolicious::Lite
 
 =head1 DESCRIPTION
 
-    <a href="[% c.url_for('about_us') %]">Hello!</a>
+    <a href="[% h.url_for('about_us') %]">Hello!</a>
 
     [% INCLUDE "include.inc" %]
 
@@ -42,10 +42,7 @@ sub _render {
     my $alloy = $self->alloy;
 
     $alloy->process( $input,
-        {
-            %{ $c->stash },
-            c => $c,
-        },
+        $self->_template_vars( $c ),
         $output,
         { binmode => ':utf8' },
     ) || do {

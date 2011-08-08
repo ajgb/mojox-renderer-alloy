@@ -1,1 +1,1 @@
-<TMPL_VAR EXPR="c.unknown_helper('foo')">
+<TMPL_VAR EXPR="h.unknown_helper('foo')">
