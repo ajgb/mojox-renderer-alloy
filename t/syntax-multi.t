@@ -8,6 +8,7 @@ use Test::More tests => 12;
 
 use Mojolicious::Lite;
 use Test::Mojo;
+use Cwd qw/abs_path/;
 
 use File::Path qw( rmtree );
 END { rmtree("t/tmp") };
@@ -51,7 +52,10 @@ while ( my ($h, $e) = each %engines ) {
 
 
 my $t = Test::Mojo->new;
-$t->app->renderer->detect_templates( 0 );
+$t->app->renderer->paths( [
+    map {  abs_path("t/templates/$_") }
+        qw( hte tmpl tt vtl )
+] );
 
 for my $h ( keys %engines ) {
     $t->get_ok("/\L$h")

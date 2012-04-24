@@ -9,6 +9,7 @@ use Test::More tests => 25;
 use Mojolicious::Lite;
 use Mojo::ByteStream 'b';
 use Test::Mojo;
+use Cwd qw/abs_path/;
 
 use File::Path qw( rmtree );
 END { rmtree("t/tmp") };
@@ -47,7 +48,7 @@ get '/foo/:message' => 'index';
 
 
 my $t = Test::Mojo->new;
-$t->app->renderer->detect_templates( 0 );
+$t->app->renderer->paths( [ abs_path("t/templates/tt") ] );
 
 # Exception
 $t->get_ok('/exception')
