@@ -84,11 +84,11 @@ sub _render {
     } else {
         # inlined templates are not supported
         if ( $r->get_data_template($options, $tname) ) {
-            $c->render_exception(
+            $c->reply->exception(
                 "Inlined templates are not supported"
             );
         } else {
-            $c->render_not_found( $tname );
+            $c->reply->not_found( $tname );
         };
         return;
     }
@@ -103,7 +103,7 @@ sub _render {
     };
     if ( my $e = $alloy->error || $@ ) {
         chomp $e;
-        $c->render_exception( $e );
+        $c->reply->exception( $e );
 
         return;
     };

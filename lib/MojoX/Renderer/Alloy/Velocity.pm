@@ -55,7 +55,7 @@ sub _render {
     ) || do {
         my $e = $alloy->error;
         chomp $e;
-        $c->render_exception( $e );
+        $c->reply->exception( $e );
 
         return;
     };
