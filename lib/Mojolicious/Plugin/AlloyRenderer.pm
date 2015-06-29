@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::Loader;
+use Mojo::Loader qw/load_class/;
 
 =head1 SYNOPSIS
 
@@ -172,13 +172,11 @@ sub register {
         push @setup, [ TT => $syn2ext{TT} ];
     }
 
-    my $loader = Mojo::Loader->new;
-
     for my $syn ( @setup ) {
         my ($module, $extension) = @$syn;
         my $class = "MojoX::Renderer::Alloy::$module";
 
-        $loader->load( $class );
+        load_class( $class );
 
         my $alloy = $class->build(%$args, app => $app);
 
